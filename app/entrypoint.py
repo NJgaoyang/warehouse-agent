@@ -13,6 +13,7 @@ backend_app.include_router(architecture_router)
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 INDEX_FILE = STATIC_DIR / "index.html"
 ARCH_JS_FILE = STATIC_DIR / "warehouse-architecture.js"
+API_FIX_JS_FILE = STATIC_DIR / "api-fix.js"
 
 
 class FrontendFirstApp:
@@ -23,14 +24,27 @@ class FrontendFirstApp:
             path = scope.get("path")
             if path in {"/", "/index.html"}:
                 html = INDEX_FILE.read_text(encoding="utf-8")
-                script = '<script src="/warehouse-architecture.js?v=1"></script>'
-                if script not in html:
-                    html = html.replace("</body>", script + "\n</body>")
+                scripts = (
+                    '<script src="/warehouse-architecture.js?v=2"></script>\n'
+                    '<script src="/api-fix.js?v=1"></script>'
+                )
+                if '/warehouse-architecture.js?v=2' not in html:
+                    html = html.replace("</body>", scripts + "\n</body>")
                 response = HTMLResponse(html)
                 await response(scope, receive, send)
                 return
             if path == "/warehouse-architecture.js":
-                response = FileResponse(ARCH_JS_FILE, media_type="application/javascript; charset=utf-8")
+                response = FileResponse(
+                    ARCH_JS_FILE,
+                    media_type="application/javascript; charset=utf-8",
+                )
+                await response(scope, receive, send)
+                return
+            if path == "/api-fix.js":
+                response = FileResponse(
+                    API_FIX_JS_FILE,
+                    media_type="application/javascript; charset=utf-8",
+                )
                 await response(scope, receive, send)
                 return
         await backend_app(scope, receive, send)
