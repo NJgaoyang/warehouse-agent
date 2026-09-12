@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.code_index import CodeIndexService
-from app.db import CodeLineage, get_db
+from app.db import CodeLineage, SourceArtifact, get_db
 from app.warehouse_analysis import WarehouseAnalysisService
 
 
@@ -24,17 +24,8 @@ def _internal_error(operation: str, exc: Exception) -> HTTPException:
     )
 
 
-def _safe_lineage(service: WarehouseAnalysisService, db: Session, table: str) -> dict:
-    """Return lineage without depending on the legacy table_name response key.
-
-    Warehouse model JSON exposes the physical table as ``table``.  Older lineage
-    code expected ``table_name`` and raised KeyError when a model row was clicked.
-    Keep this compatibility helper at the API boundary so deployed databases do
-    not need a migration.
-    """
+def _model_candidates(model: dict | None, table: str) -> set[str]:
     clean = (table or "").replace("`", "").replace('"', "").strip()
-    model = service.model_by_name(clean)
-
     candidates = {clean}
     if "." in clean:
         candidates.add(clean.rsplit(".", 1)[-1])
@@ -45,6 +36,14 @@ def _safe_lineage(service: WarehouseAnalysisService, db: Session, table: str) ->
             candidates.add(qualified_name)
         if physical_table:
             candidates.add(physical_table)
+    return {x for x in candidates if x}
+
+
+def _safe_lineage(service: WarehouseAnalysisService, db: Session, table: str) -> dict:
+    """Return lineage without depending on the legacy table_name response key."""
+    clean = (table or "").replace("`", "").replace('"', "").strip()
+    model = service.model_by_name(clean)
+    candidates = _model_candidates(model, clean)
 
     edges = (
         db.query(CodeLineage)
@@ -64,6 +63,72 @@ def _safe_lineage(service: WarehouseAnalysisService, db: Session, table: str) ->
         "table": clean,
         "model": model,
         "edges": related[:500],
+    }
+
+
+def _artifact_payload(artifact: SourceArtifact) -> dict:
+    position_parts = [
+        artifact.project_name,
+        artifact.workflow_name,
+        artifact.task_name,
+    ]
+    return {
+        "artifact_id": artifact.id,
+        "project_code": artifact.project_code,
+        "project_name": artifact.project_name,
+        "workflow_code": artifact.workflow_code,
+        "workflow_name": artifact.workflow_name,
+        "task_code": artifact.task_code,
+        "task_name": artifact.task_name,
+        "task_type": artifact.task_type,
+        "file_path": artifact.file_path,
+        "metadata_path": artifact.metadata_path,
+        "position": " / ".join(str(x) for x in position_parts if x),
+    }
+
+
+def _task_references(service: WarehouseAnalysisService, db: Session, table: str) -> dict:
+    clean = (table or "").replace("`", "").replace('"', "").strip()
+    model = service.model_by_name(clean)
+    candidates = _model_candidates(model, clean)
+
+    edges = (
+        db.query(CodeLineage)
+        .filter(CodeLineage.relation_type == "TABLE_LINEAGE")
+        .all()
+    )
+    producer_ids = {
+        edge.artifact_id
+        for edge in edges
+        if edge.target_name in candidates
+    }
+    consumer_ids = {
+        edge.artifact_id
+        for edge in edges
+        if edge.source_name in candidates
+    }
+    artifact_ids = producer_ids | consumer_ids
+    artifacts = []
+    if artifact_ids:
+        artifacts = (
+            db.query(SourceArtifact)
+            .filter(SourceArtifact.id.in_(artifact_ids))
+            .order_by(
+                SourceArtifact.project_name,
+                SourceArtifact.workflow_name,
+                SourceArtifact.task_name,
+            )
+            .all()
+        )
+    by_id = {x.id: x for x in artifacts}
+    producers = [_artifact_payload(by_id[x]) for x in sorted(producer_ids) if x in by_id]
+    consumers = [_artifact_payload(by_id[x]) for x in sorted(consumer_ids) if x in by_id]
+    return {
+        "table": clean,
+        "producer_count": len(producers),
+        "consumer_count": len(consumers),
+        "producers": producers,
+        "consumers": consumers,
     }
 
 
@@ -151,6 +216,21 @@ def warehouse_model_detail(model_id: int, db: Session = Depends(get_db)):
         raise _internal_error(f"model_detail:{model_id}", exc)
 
 
+@router.get("/models/{model_id}/task-references")
+def warehouse_model_task_references(model_id: int, db: Session = Depends(get_db)):
+    """Return exact DS tasks that produce or consume a warehouse model."""
+    try:
+        service = WarehouseAnalysisService(db)
+        model = service.model(model_id)
+        if not model:
+            raise HTTPException(404, "数仓模型不存在")
+        return _task_references(service, db, model["qualified_name"])
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise _internal_error(f"model_task_references:{model_id}", exc)
+
+
 @router.get("/lineage")
 def warehouse_lineage(table: str, db: Session = Depends(get_db)):
     try:
@@ -171,11 +251,13 @@ def warehouse_diagnostics(db: Session = Depends(get_db)):
         if sample:
             detail = service.model(sample[0]["id"])
             _safe_lineage(service, db, sample[0]["qualified_name"])
+            _task_references(service, db, sample[0]["qualified_name"])
         return {
             "success": True,
             "overview_ok": True,
             "models_ok": True,
             "detail_ok": detail is not None if sample else True,
+            "task_references_ok": True,
             "sample_model": sample[0]["qualified_name"] if sample else None,
             "total_tables": overview.get("total_tables", 0),
         }
