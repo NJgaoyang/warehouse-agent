@@ -1,7 +1,5 @@
 (() => {
-  // The original prototype tried response.json() and then response.text() on
-  // parse failure.  A Fetch Response body is a one-shot stream, so the second
-  // read raised: "body stream already read".  Read once, then parse locally.
+  // Fetch Response body can only be consumed once. Read text once, then parse.
   window.api = async function api(url, opt = {}) {
     const response = await fetch(url, {
       headers: {
@@ -26,9 +24,16 @@
       if (typeof data === 'string' && data.trim()) {
         message = data;
       } else if (data && typeof data === 'object') {
-        message = data.detail || data.message || JSON.stringify(data);
+        const detail = data.detail;
+        if (detail && typeof detail === 'object') {
+          const operation = detail.operation ? `${detail.operation} · ` : '';
+          const type = detail.error_type ? `${detail.error_type}: ` : '';
+          message = `${operation}${type}${detail.message || JSON.stringify(detail)}`;
+        } else {
+          message = detail || data.message || JSON.stringify(data);
+        }
       }
-      throw new Error(message);
+      throw new Error(`${url} · ${message}`);
     }
     return data;
   };
