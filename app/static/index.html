@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Warehouse Agent</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;height:100%;font-family:Inter,"PingFang SC","Microsoft YaHei",Arial,sans-serif;background:#f5f7fb;color:#202635}button,input,select,textarea{font:inherit}.app{height:100vh;display:flex;flex-direction:column;overflow:hidden}.top{height:58px;background:#111827;color:#fff;display:flex;align-items:center;padding:0 18px;flex:none;border-bottom:1px solid #202a3b}.brand{display:flex;align-items:center;gap:10px;font-weight:700;min-width:260px}.logo{width:31px;height:31px;border-radius:9px;background:linear-gradient(135deg,#5572ff,#7656ef);display:grid;place-items:center}.crumb{font-size:12px;color:#8c97ab}.crumb b{color:#dce2eb;font-weight:600}.top-actions{margin-left:auto;display:flex;align-items:center;gap:9px}.top-btn{height:32px;border:1px solid #2f394c;background:#172033;color:#dce1e9;border-radius:7px;padding:0 10px}.body{display:flex;min-height:0;flex:1}.side{width:222px;background:#151d2c;color:#b9c2d1;padding:11px 10px;overflow:auto}.side-title{font-size:10px;color:#667186;padding:12px 11px 7px;text-transform:uppercase}.nav{height:39px;border-radius:8px;display:flex;align-items:center;gap:9px;padding:0 11px;margin:2px 0;font-size:13px;cursor:pointer}.nav:hover,.nav.active{background:#283456;color:#fff}.ico{width:20px;color:#8fa1c6}.main{flex:1;overflow:auto;min-width:0}.page{display:none;padding:20px;min-height:100%}.page.active{display:block}.header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px}.header h1{font-size:22px;margin:0 0 5px}.header p{margin:0;font-size:12px;color:#7d8798}.btn{height:34px;border:1px solid #dfe4ec;background:#fff;color:#394354;border-radius:8px;padding:0 12px;cursor:pointer}.btn:hover{border-color:#91a0ff;color:#4f63df}.btn.primary{background:#536df0;border-color:#536df0;color:#fff}.btn.danger{border-color:#efc2c2;color:#c74d4d;background:#fff5f5}.btn.small{height:28px;font-size:11px;padding:0 9px}.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}.grid2{display:grid;grid-template-columns:1.25fr .75fr;gap:13px}.card{background:#fff;border:1px solid #e7eaf0;border-radius:11px;box-shadow:0 3px 10px rgba(20,30,50,.03)}.metric{padding:15px}.metric label{font-size:11px;color:#818b9d}.metric .value{font-size:27px;font-weight:700;margin-top:8px}.metric .desc{font-size:10px;color:#16a36a;margin-top:4px}.section-head{height:45px;border-bottom:1px solid #e9edf2;display:flex;align-items:center;justify-content:space-between;padding:0 14px}.section-title{font-size:13px;font-weight:700}.muted{font-size:11px;color:#8791a2}.table{width:100%;border-collapse:collapse}.table th,.table td{padding:10px 13px;border-bottom:1px solid #edf0f4;text-align:left;font-size:11px}.table th{background:#fafbfc;color:#6d7687}.tag{display:inline-flex;align-items:center;padding:3px 7px;border-radius:20px;background:#eef1ff;color:#5368dd;font-size:10px}.tag.green{background:#e9f7f0;color:#168d5b}.tag.warn{background:#fff4dc;color:#b27600}.tag.red{background:#fff0f0;color:#c54c4c}.section{margin-top:13px}.split{display:grid;grid-template-columns:300px 1fr;gap:13px}.panel{padding:14px}.form-row{margin-bottom:12px}.form-row label{display:block;font-size:11px;color:#687386;margin-bottom:5px}.form-row input,.form-row select,.search{width:100%;height:34px;border:1px solid #dfe4eb;border-radius:7px;padding:0 9px;outline:none}.form-row input:focus,.search:focus{border-color:#8495ff;box-shadow:0 0 0 3px #eef1ff}.toolbar{display:flex;gap:8px}.list{padding:8px}.list-item{border:1px solid transparent;border-radius:8px;padding:10px;cursor:pointer;margin-bottom:5px}.list-item:hover,.list-item.active{background:#f3f5ff;border-color:#e0e5ff}.list-item b{font-size:12px}.list-item div{font-size:10px;color:#8791a2;margin-top:5px}.code{background:#121826;color:#d8deea;border-radius:9px;min-height:350px;padding:14px;white-space:pre-wrap;font:11px/1.7 Consolas,monospace;overflow:auto}.tree{padding:9px}.tree-row{padding:8px 9px;border-radius:7px;font-size:11px;cursor:pointer}.tree-row:hover,.tree-row.active{background:#f0f3ff;color:#4c62dc}.activity{padding:10px 14px}.act{padding:10px 0;border-bottom:1px dashed #edf0f4;font-size:11px;line-height:1.55}.act:last-child{border-bottom:0}.workspace{display:grid;grid-template-columns:280px 1fr;gap:13px}.steps{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:13px;border-bottom:1px solid #edf0f4}.step{font-size:10px;padding:6px 8px;border-radius:16px;background:#f1f3f7;color:#7c8594}.step.done{background:#e9f7f0;color:#168d5b}.step.current{background:#eaf0ff;color:#4f63df}.tabs{display:flex;gap:18px;height:40px;border-bottom:1px solid #edf0f4;padding:0 13px}.tab{border:0;background:transparent;color:#7d8797;cursor:pointer;font-size:11px}.tab.active{color:#4c61db;font-weight:700;border-bottom:2px solid #596ff0}.tabpane{display:none;padding:14px}.tabpane.active{display:block}.notice{padding:11px 12px;border-radius:8px;background:#f4f6ff;color:#5062c9;font-size:11px;line-height:1.6}.kv{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:12px}.kv div{background:#f8f9fc;border:1px solid #edf0f4;border-radius:8px;padding:10px}.kv small{display:block;color:#8a94a4;font-size:9px}.kv b{display:block;font-size:12px;margin-top:4px}.statusbar{position:fixed;bottom:14px;right:18px;background:#162033;color:#fff;padding:9px 12px;border-radius:8px;font-size:11px;opacity:0;transform:translateY(5px);transition:.2s;pointer-events:none}.statusbar.show{opacity:1;transform:translateY(0)}.empty{padding:26px;text-align:center;color:#8b94a3;font-size:11px}@media(max-width:1200px){.grid4{grid-template-columns:repeat(2,1fr)}.grid2,.split,.workspace{grid-template-columns:1fr}.side{width:185px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <div class="brand"><div class="logo">W</div><div>Warehouse Agent</div></div>
+    <div class="crumb">独立 AI 数仓研发平台 / <b id="pageName">工作台</b></div>
+    <div class="top-actions"><button class="top-btn" onclick="location.href='/docs'">API 文档</button><button class="top-btn" id="healthBtn">健康检查</button></div>
+  </div>
+  <div class="body">
+    <aside class="side">
+      <div class="side-title">AI 数仓研发</div>
+      <div class="nav active" data-page="dashboard"><span class="ico">◫</span>工作台</div>
+      <div class="nav" data-page="tasks"><span class="ico">✦</span>研发任务</div>
+      <div class="nav" data-page="architecture"><span class="ico">⌘</span>数仓架构</div>
+      <div class="side-title">数据资产</div>
+      <div class="nav" data-page="dolphinscheduler"><span class="ico">DS</span>DolphinScheduler</div>
+      <div class="nav" data-page="source"><span class="ico">▧</span>现有代码</div>
+      <div class="nav" data-page="datasources"><span class="ico">◉</span>数据源</div>
+      <div class="nav" data-page="metadata"><span class="ico">▦</span>元数据</div>
+      <div class="side-title">研发工程</div>
+      <div class="nav" data-page="workspace"><span class="ico">⌁</span>Agent 工作区</div>
+      <div class="nav" data-page="validation"><span class="ico">✓</span>数据校验</div>
+      <div class="nav" data-page="releases"><span class="ico">⇧</span>发布包</div>
+    </aside>
+    <main class="main">
+      <section class="page active" id="page-dashboard">
+        <div class="header"><div><h1>工作台</h1><p>观察现有数仓资产、Agent 研发任务和自动校验状态</p></div><button class="btn primary" onclick="showPage('tasks')">+ 新建研发任务</button></div>
+        <div class="grid4" id="metrics"></div>
+        <div class="grid2 section">
+          <div class="card"><div class="section-head"><span class="section-title">近期研发任务</span><button class="btn small" onclick="showPage('tasks')">查看全部</button></div><div id="dashboardTasks"></div></div>
+          <div class="card"><div class="section-head"><span class="section-title">平台状态</span></div><div class="activity"><div class="act">代码来源：<b>DolphinScheduler MySQL → 本地 source/</b></div><div class="act">Agent 新代码：<b>workspaces/&lt;task_no&gt;/</b></div><div class="act">人工验收后：<b>releases/&lt;task_no&gt;/</b></div><div class="act">Swagger：<a href="/docs" target="_blank">/docs</a></div></div></div>
+        </div>
+      </section>
+
+      <section class="page" id="page-dolphinscheduler">
+        <div class="header"><div><h1>DolphinScheduler</h1><p>配置 DS 元数据库，并将 SQL Task 导出到 VM 本地 source/ 目录</p></div><div class="toolbar"><button class="btn" id="dsTest">测试连接</button><button class="btn primary" id="dsImport">同步现有代码</button></div></div>
+        <div class="split"><div class="card panel"><div class="form-row"><label>Host</label><input id="dsHost" placeholder="192.168.x.x"></div><div class="form-row"><label>Port</label><input id="dsPort" value="3306"></div><div class="form-row"><label>Database</label><input id="dsDb" value="dolphinscheduler"></div><div class="form-row"><label>Username</label><input id="dsUser" placeholder="warehouse_agent"></div><div class="form-row"><label>Password</label><input id="dsPassword" type="password" placeholder="仅保存时使用"></div><button class="btn primary" id="dsSave" style="width:100%">保存配置</button></div><div class="card"><div class="section-head"><span class="section-title">同步说明</span></div><div class="panel"><div class="notice">Warehouse Agent 只读 DolphinScheduler MySQL。同步后，每个 SQL Task 会保存为 <b>task.sql + task.json</b>，Agent 后续只分析本地 source/，不会修改 DS 任务。</div><div class="kv section"><div><small>现有代码</small><b>data/source/</b></div><div><small>Agent 新代码</small><b>data/workspaces/</b></div><div><small>发布包</small><b>data/releases/</b></div></div><div id="dsResult" class="code" style="min-height:180px">等待操作...</div></div></div></div>
+      </section>
+
+      <section class="page" id="page-source">
+        <div class="header"><div><h1>现有代码</h1><p>从 DolphinScheduler 导出的只读 SQL 快照</p></div><div class="toolbar"><button class="btn" id="rebuildIndex">重建索引</button><button class="btn primary" onclick="showPage('dolphinscheduler')">从 DS 同步</button></div></div>
+        <div class="workspace"><div class="card"><div class="panel"><input class="search" id="sourceSearch" placeholder="搜索任务 / SQL"><button class="btn section" id="sourceSearchBtn" style="width:100%">搜索</button></div><div id="sourceList" class="list"></div></div><div class="card"><div class="section-head"><span class="section-title" id="sourceTitle">请选择一个 SQL Task</span></div><div class="panel"><div id="sourceMeta" class="muted"></div><div id="sourceCode" class="code section">SELECT ...</div></div></div></div>
+      </section>
+
+      <section class="page" id="page-tasks">
+        <div class="header"><div><h1>研发任务</h1><p>需求 → 设计 → SQL 开发 → 执行 → 校验 → 人工验收</p></div><button class="btn primary" id="createTask">+ 创建示例任务</button></div>
+        <div class="workspace"><div class="card"><div id="taskList" class="list"></div></div><div class="card" id="taskDetail"><div class="empty">选择左侧任务查看详情</div></div></div>
+      </section>
+
+      <section class="page" id="page-architecture">
+        <div class="header"><div><h1>数仓架构</h1><p>主题域、主题和 ODS / DWD / DWS / ADS 模型视图</p></div><button class="btn" id="archScan">重新识别数仓</button></div><div id="domains" class="grid4"></div>
+      </section>
+
+      <section class="page" id="page-datasources">
+        <div class="header"><div><h1>数据源</h1><p>生产数据源建议只读，Agent 开发环境允许写入</p></div></div><div class="card"><div id="datasourceTable"></div></div>
+      </section>
+
+      <section class="page" id="page-metadata">
+        <div class="header"><div><h1>元数据</h1><p>Warehouse Agent 扫描到的真实库表、分层和主题归属</p></div></div><div class="card"><div id="metadataTable"></div></div>
+      </section>
+
+      <section class="page" id="page-workspace">
+        <div class="header"><div><h1>Agent 工作区</h1><p>所有新开发代码只写入 workspaces/，与现有 source/ 完全隔离</p></div></div><div class="card panel"><div class="notice">选择“研发任务”后可查看当前任务的 workspace 文件。目录包括 requirement.md、design/、sql/ddl/、sql/etl/、validation/、result/。</div><div id="workspaceInfo" class="section"></div></div>
+      </section>
+
+      <section class="page" id="page-validation">
+        <div class="header"><div><h1>数据校验</h1><p>主键、NULL、汇总对账、波动等技术校验在人工验收前完成</p></div></div><div class="card"><div class="empty">进入研发任务后运行校验，结果会显示在任务详情中。</div></div>
+      </section>
+
+      <section class="page" id="page-releases">
+        <div class="header"><div><h1>发布包</h1><p>人工验收通过后生成 RELEASE_READY 包，当前版本不会自动回写 DolphinScheduler</p></div></div><div class="card"><div id="releaseTable"></div></div>
+      </section>
+    </main>
+  </div>
+</div>
+<div id="status" class="statusbar"></div>
+<script>
+const names={dashboard:'工作台',tasks:'研发任务',architecture:'数仓架构',dolphinscheduler:'DolphinScheduler',source:'现有代码',datasources:'数据源',metadata:'元数据',workspace:'Agent 工作区',validation:'数据校验',releases:'发布包'};
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+function toast(msg){const x=$('#status');x.textContent=msg;x.classList.add('show');clearTimeout(window._t);window._t=setTimeout(()=>x.classList.remove('show'),2200)}
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+async function api(url,opt={}){const r=await fetch(url,{headers:{'Content-Type':'application/json',...(opt.headers||{})},...opt});let data;try{data=await r.json()}catch{data=await r.text()}if(!r.ok)throw new Error(typeof data==='string'?data:(data.detail||JSON.stringify(data)));return data}
+function showPage(name){$$('.page').forEach(p=>p.classList.toggle('active',p.id==='page-'+name));$$('.nav').forEach(n=>n.classList.toggle('active',n.dataset.page===name));$('#pageName').textContent=names[name]||name;if(name==='dashboard')loadDashboard();if(name==='tasks')loadTasks();if(name==='architecture')loadDomains();if(name==='datasources')loadDatasources();if(name==='metadata')loadMetadata();if(name==='source')loadSource();if(name==='releases')loadReleases();if(name==='dolphinscheduler')loadDsConfig()}
+$$('.nav').forEach(n=>n.onclick=()=>showPage(n.dataset.page));
+$('#healthBtn').onclick=async()=>{try{const d=await api('/api/health');toast('服务正常 · '+d.version+' · mock='+d.mock_external)}catch(e){toast(e.message)}};
+async function loadDashboard(){try{const d=await api('/api/dashboard');const m=d.metrics||{};$('#metrics').innerHTML=[['主题域',m.domains??0,'已识别'],['数仓模型',m.models??0,'元数据模型'],['研发任务',m.tasks??0,'Agent Task'],['校验通过率',(m.validation_pass_rate??100)+'%','自动技术校验']].map(x=>`<div class="card metric"><label>${x[0]}</label><div class="value">${x[1]}</div><div class="desc">${x[2]}</div></div>`).join('');renderTaskTable('#dashboardTasks',d.tasks||[])}catch(e){toast(e.message)}}
+function renderTaskTable(sel,rows){$(sel).innerHTML=rows.length?`<table class="table"><thead><tr><th>任务</th><th>主题域 / 主题</th><th>阶段</th><th>状态</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${esc(x.title)}</td><td>${esc(x.domain||'-')} / ${esc(x.subject||'-')}</td><td>${esc(x.phase)}</td><td><span class="tag">${esc(x.status)}</span></td></tr>`).join('')}</tbody></table>`:'<div class="empty">暂无研发任务</div>'}
+async function loadDsConfig(){try{const d=await api('/api/dolphinscheduler/config');if(!d)return;$('#dsHost').value=d.host||'';$('#dsPort').value=d.port||3306;$('#dsDb').value=d.database_name||'dolphinscheduler';$('#dsUser').value=d.username||''}catch(e){toast(e.message)}}
+$('#dsSave').onclick=async()=>{try{const body={name:'DolphinScheduler',host:$('#dsHost').value,port:Number($('#dsPort').value||3306),username:$('#dsUser').value,password:$('#dsPassword').value,database_name:$('#dsDb').value};const d=await api('/api/dolphinscheduler/config',{method:'PUT',body:JSON.stringify(body)});$('#dsResult').textContent=JSON.stringify(d,null,2);toast('DS 配置已保存')}catch(e){toast(e.message)}};
+$('#dsTest').onclick=async()=>{try{const d=await api('/api/dolphinscheduler/test',{method:'POST'});$('#dsResult').textContent=JSON.stringify(d,null,2);toast(d.success?'连接成功':'连接失败')}catch(e){toast(e.message)}};
+$('#dsImport').onclick=async()=>{try{$('#dsResult').textContent='正在同步...';const d=await api('/api/dolphinscheduler/import',{method:'POST',body:JSON.stringify({overwrite:true})});$('#dsResult').textContent=JSON.stringify(d,null,2);toast('DS SQL 已同步到本地 source/')}catch(e){$('#dsResult').textContent=e.message;toast(e.message)}};
+async function loadSource(){try{const q=$('#sourceSearch')?.value||'';const rows=await api('/api/source/files'+(q?'?q='+encodeURIComponent(q):''));$('#sourceList').innerHTML=rows.length?rows.map(x=>`<div class="list-item" data-id="${x.id}"><b>${esc(x.task_name)}</b><div>${esc(x.project_name)} / ${esc(x.workflow_name)}</div></div>`).join(''):'<div class="empty">暂无本地 SQL，请先从 DS 同步</div>';$$('#sourceList .list-item').forEach(el=>el.onclick=()=>openSource(el.dataset.id))}catch(e){toast(e.message)}}
+$('#sourceSearchBtn').onclick=loadSource;$('#rebuildIndex').onclick=async()=>{try{const d=await api('/api/source/index/rebuild',{method:'POST'});toast('索引已重建：'+JSON.stringify(d));loadSource()}catch(e){toast(e.message)}};
+async function openSource(id){try{const d=await api('/api/source/files/'+id);$('#sourceTitle').textContent=d.task;$('#sourceMeta').textContent=`${d.project} / ${d.workflow} · ${d.file_path}`;$('#sourceCode').textContent=d.sql||''}catch(e){toast(e.message)}}
+async function loadTasks(){try{const rows=await api('/api/tasks');$('#taskList').innerHTML=rows.length?rows.map(x=>`<div class="list-item" data-id="${x.id}"><b>${esc(x.title)}</b><div>${esc(x.task_no)} · ${esc(x.phase)} · ${esc(x.status)}</div></div>`).join(''):'<div class="empty">暂无任务</div>';$$('#taskList .list-item').forEach(el=>el.onclick=()=>openTask(el.dataset.id))}catch(e){toast(e.message)}}
+$('#createTask').onclick=async()=>{try{const body={title:'城市渠道订单日汇总',requirement:'基于现有订单、支付、退款数据，新建城市渠道日汇总模型，并在开发环境执行后进行数据校验。',owner:'Yang'};await api('/api/tasks',{method:'POST',body:JSON.stringify(body)});toast('任务已创建');loadTasks()}catch(e){toast(e.message)}};
+async function openTask(id){try{const d=await api('/api/tasks/'+id),t=d.task;$('#taskDetail').innerHTML=`<div class="section-head"><div><span class="section-title">${esc(t.title)}</span><div class="muted">${esc(t.task_no)} · ${esc(t.domain||'-')} / ${esc(t.subject||'-')}</div></div><button class="btn small" id="continueTask">继续执行</button></div><div class="steps"><span class="step done">上下文分析</span><span class="step done">主题设计</span><span class="step done">模型设计</span><span class="step current">${esc(t.phase)}</span><span class="step">数据校验</span><span class="step">人工验收</span></div><div class="tabs"><button class="tab active" data-tab="design">设计</button><button class="tab" data-tab="sql">SQL</button><button class="tab" data-tab="files">工作区文件</button><button class="tab" data-tab="validate">校验</button></div><div id="pane-design" class="tabpane active"><div class="notice">${esc(t.requirement||'')}</div><pre class="code section">${esc(JSON.stringify(d.design||{},null,2))}</pre></div><div id="pane-sql" class="tabpane"><pre class="code">${esc(d.sql||'-- Agent 尚未生成 SQL')}</pre></div><div id="pane-files" class="tabpane"><pre class="code">${esc(JSON.stringify(d.files||[],null,2))}</pre></div><div id="pane-validate" class="tabpane"><button class="btn primary" id="runValidation">运行数据校验</button><pre class="code section" id="validationResult">等待运行...</pre></div>`;$$('#taskDetail .tab').forEach(x=>x.onclick=()=>{$$('#taskDetail .tab').forEach(y=>y.classList.remove('active'));x.classList.add('active');$$('#taskDetail .tabpane').forEach(y=>y.classList.remove('active'));$('#pane-'+x.dataset.tab).classList.add('active')});$('#continueTask').onclick=async()=>{try{await api('/api/tasks/'+id+'/continue',{method:'POST'});toast('任务已推进');openTask(id);loadTasks()}catch(e){toast(e.message)}};$('#runValidation').onclick=async()=>{try{const v=await api('/api/tasks/'+id+'/validations/run',{method:'POST'});$('#validationResult').textContent=JSON.stringify(v,null,2);toast('数据校验完成')}catch(e){toast(e.message)}};$('#workspaceInfo').innerHTML=`<div class="notice">当前任务：<b>${esc(t.task_no)}</b><br>workspace 文件数：${(d.files||[]).length}</div>`}catch(e){toast(e.message)}}
+async function loadDomains(){try{const rows=await api('/api/architecture/domains');$('#domains').innerHTML=rows.length?rows.map(x=>`<div class="card metric"><label>${esc(x.code)}</label><div class="value" style="font-size:20px">${esc(x.name)}</div><div class="muted">${(x.subjects||[]).map(esc).join(' / ')||'未识别主题'}</div></div>`).join(''):'<div class="empty">暂无主题域</div>'}catch(e){toast(e.message)}}
+$('#archScan').onclick=async()=>{try{const d=await api('/api/architecture/scan',{method:'POST'});toast(d.message||'数仓识别完成');loadDomains()}catch(e){toast(e.message)}};
+async function loadDatasources(){try{const rows=await api('/api/datasources');$('#datasourceTable').innerHTML=rows.length?`<table class="table"><thead><tr><th>名称</th><th>类型</th><th>地址</th><th>环境</th><th>权限</th><th>状态</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${esc(x.name)}</td><td>${esc(x.type)}</td><td>${esc(x.host)}:${esc(x.port)}</td><td>${esc(x.environment)}</td><td>${x.readonly?'只读':'可写'}</td><td><span class="tag green">启用</span></td></tr>`).join('')}</tbody></table>`:'<div class="empty">暂无数据源</div>'}catch(e){toast(e.message)}}
+async function loadMetadata(){try{const rows=await api('/api/metadata/tables');$('#metadataTable').innerHTML=rows.length?`<table class="table"><thead><tr><th>数据库</th><th>表</th><th>分层</th><th>主题域</th><th>主题</th><th>行数</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${esc(x.database)}</td><td>${esc(x.table)}</td><td><span class="tag">${esc(x.layer||'-')}</span></td><td>${esc(x.domain||'-')}</td><td>${esc(x.subject||'-')}</td><td>${esc(x.row_count??'-')}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">暂无元数据，请扫描数据源</div>'}catch(e){toast(e.message)}}
+async function loadReleases(){try{const rows=await api('/api/releases');$('#releaseTable').innerHTML=rows.length?`<table class="table"><thead><tr><th>任务</th><th>状态</th><th>路径</th></tr></thead><tbody>${rows.map(x=>`<tr><td>${esc(x.task_no||x.title||'-')}</td><td><span class="tag green">RELEASE_READY</span></td><td>${esc(x.release_path||x.path||'-')}</td></tr>`).join('')}</tbody></table>`:'<div class="empty">暂无发布包</div>'}catch(e){toast(e.message)}}
+loadDashboard();
+</script>
+</body>
+</html>
