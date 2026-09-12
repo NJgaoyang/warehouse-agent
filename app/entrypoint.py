@@ -14,6 +14,7 @@ STATIC_DIR = Path(__file__).resolve().parent / "static"
 INDEX_FILE = STATIC_DIR / "index.html"
 ARCH_JS_FILE = STATIC_DIR / "warehouse-architecture.js"
 API_FIX_JS_FILE = STATIC_DIR / "api-fix.js"
+UI_TOAST_JS_FILE = STATIC_DIR / "ui-toast-position.js"
 
 
 class FrontendFirstApp:
@@ -26,9 +27,10 @@ class FrontendFirstApp:
                 html = INDEX_FILE.read_text(encoding="utf-8")
                 scripts = (
                     '<script src="/warehouse-architecture.js?v=3"></script>\n'
-                    '<script src="/api-fix.js?v=2"></script>'
+                    '<script src="/api-fix.js?v=2"></script>\n'
+                    '<script src="/ui-toast-position.js?v=1"></script>'
                 )
-                if '/warehouse-architecture.js?v=3' not in html:
+                if '/ui-toast-position.js?v=1' not in html:
                     html = html.replace("</body>", scripts + "\n</body>")
                 response = HTMLResponse(html)
                 await response(scope, receive, send)
@@ -43,6 +45,13 @@ class FrontendFirstApp:
             if path == "/api-fix.js":
                 response = FileResponse(
                     API_FIX_JS_FILE,
+                    media_type="application/javascript; charset=utf-8",
+                )
+                await response(scope, receive, send)
+                return
+            if path == "/ui-toast-position.js":
+                response = FileResponse(
+                    UI_TOAST_JS_FILE,
                     media_type="application/javascript; charset=utf-8",
                 )
                 await response(scope, receive, send)
