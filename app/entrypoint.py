@@ -3,7 +3,12 @@ from pathlib import Path
 from starlette.responses import FileResponse
 
 from app.main import app as backend_app
+from app.architecture_api import router as architecture_router
 
+
+# Register the real warehouse-analysis APIs before application startup so the
+# WarehouseModel metadata is also known when Base.metadata.create_all runs.
+backend_app.include_router(architecture_router)
 
 INDEX_FILE = Path(__file__).resolve().parent / "static" / "index.html"
 
