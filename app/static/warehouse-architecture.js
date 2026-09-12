@@ -12,8 +12,24 @@
     .wh-domain:hover,.wh-domain.active{background:#f3f5ff;border-color:#dce2ff}.wh-domain b{font-size:12px}.wh-domain .wh-meta{font-size:10px;color:#8791a2;margin-top:5px;line-height:1.5}
     .wh-confidence{font-variant-numeric:tabular-nums}.wh-confidence.high{color:#168d5b}.wh-confidence.mid{color:#b27600}.wh-confidence.low{color:#c54c4c}
     .wh-model-row{cursor:pointer}.wh-model-row:hover{background:#f8f9ff}
-    .wh-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.wh-evidence{font-size:11px;line-height:1.7;color:#566174}
+    .wh-evidence{font-size:12px;line-height:1.75;color:#566174;word-break:break-word}
+    .wh-drawer-mask{position:fixed;inset:58px 0 0 0;background:rgba(15,23,42,.22);z-index:1200;opacity:0;visibility:hidden;transition:opacity .18s ease,visibility .18s ease}
+    .wh-drawer-mask.open{opacity:1;visibility:visible}
+    .wh-drawer{position:absolute;top:0;right:0;width:min(560px,calc(100vw - 260px));height:100%;background:#fff;box-shadow:-12px 0 36px rgba(15,23,42,.16);transform:translateX(100%);transition:transform .22s ease;display:flex;flex-direction:column}
+    .wh-drawer-mask.open .wh-drawer{transform:translateX(0)}
+    .wh-drawer-head{height:62px;flex:none;border-bottom:1px solid #e9edf2;display:flex;align-items:center;gap:10px;padding:0 18px}
+    .wh-drawer-title{min-width:0;flex:1}.wh-drawer-title b{display:block;font-size:15px;color:#202635;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.wh-drawer-title small{display:block;margin-top:4px;color:#8a94a4;font-size:10px}
+    .wh-drawer-close{width:32px;height:32px;border:0;background:#f4f6f9;border-radius:8px;color:#697386;font-size:20px;line-height:1;cursor:pointer}.wh-drawer-close:hover{background:#e9edf4;color:#1f2937}
+    .wh-drawer-body{flex:1;overflow:auto;padding:16px 18px 24px}
+    .wh-drawer-kv{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+    .wh-drawer-kv>div{background:#f8f9fc;border:1px solid #edf0f4;border-radius:9px;padding:11px}.wh-drawer-kv small{display:block;color:#8a94a4;font-size:9px}.wh-drawer-kv b{display:block;font-size:13px;margin-top:5px}
+    .wh-block{margin-top:16px}.wh-block-title{font-size:12px;font-weight:700;color:#283244;margin-bottom:8px}
+    .wh-info-box{border:1px solid #e8ecf2;background:#fbfcfe;border-radius:9px;padding:12px}
+    .wh-lineage-list{display:flex;flex-wrap:wrap;gap:6px}.wh-lineage-chip{max-width:100%;padding:5px 8px;border-radius:6px;background:#f1f4fb;color:#4d5d76;font-size:10px;word-break:break-all}
+    .wh-direction{display:grid;grid-template-columns:1fr 1fr;gap:10px}.wh-direction-col{min-width:0}
+    .wh-loading{padding:48px 18px;text-align:center;color:#8791a2;font-size:12px}
     @media(max-width:1300px){.wh-layer-grid{grid-template-columns:repeat(3,1fr)}}
+    @media(max-width:760px){.wh-drawer{width:100%;max-width:100%}.wh-direction{grid-template-columns:1fr}.wh-drawer-kv{grid-template-columns:1fr}.wh-drawer-mask{inset:58px 0 0 0}}
   `;
   document.head.appendChild(style);
 
@@ -39,10 +55,28 @@
             </div>
             <div id="whModels"><div class="empty">点击“重新识别数仓”开始分析真实 DS SQL</div></div>
           </div>
-          <div id="whDetail" class="card section" style="display:none"></div>
         </div>
       </div>`;
   }
+
+  const drawerMask = document.createElement('div');
+  drawerMask.className = 'wh-drawer-mask';
+  drawerMask.id = 'whDrawerMask';
+  drawerMask.innerHTML = `
+    <aside class="wh-drawer" role="dialog" aria-modal="true" aria-label="数仓模型详情">
+      <div class="wh-drawer-head">
+        <div class="wh-drawer-title"><b id="whDrawerTitle">模型详情</b><small id="whDrawerSubtitle">Warehouse Model</small></div>
+        <span class="tag" id="whDrawerLayer">-</span>
+        <button class="wh-drawer-close" id="whDrawerClose" aria-label="关闭">×</button>
+      </div>
+      <div class="wh-drawer-body" id="whDrawerBody"><div class="wh-loading">正在加载模型详情...</div></div>
+    </aside>`;
+  document.body.appendChild(drawerMask);
+
+  const closeDrawer = () => drawerMask.classList.remove('open');
+  document.getElementById('whDrawerClose').onclick = closeDrawer;
+  drawerMask.onclick = e => { if (e.target === drawerMask) closeDrawer(); };
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDrawer(); });
 
   let overview = null;
   let selectedDomain = '';
@@ -107,26 +141,82 @@
     } catch (e) { toast(e.message); }
   }
 
+  function renderChips(items, emptyText='无') {
+    const rows = [...new Set((items || []).filter(Boolean))];
+    if (!rows.length) return `<span class="muted">${emptyText}</span>`;
+    return `<div class="wh-lineage-list">${rows.map(x=>`<span class="wh-lineage-chip">${esc(x)}</span>`).join('')}</div>`;
+  }
+
   async function openWarehouseModel(id) {
+    drawerMask.classList.add('open');
+    document.getElementById('whDrawerTitle').textContent = '模型详情';
+    document.getElementById('whDrawerSubtitle').textContent = '正在加载...';
+    document.getElementById('whDrawerLayer').textContent = '-';
+    document.getElementById('whDrawerBody').innerHTML = '<div class="wh-loading">正在加载模型详情...</div>';
+
     try {
-      const model = await api('/api/warehouse/models/' + id);
-      const lineage = await api('/api/warehouse/lineage?table=' + encodeURIComponent(model.qualified_name));
+      let payload;
+      try {
+        payload = await api('/api/warehouse/models/' + id + '/detail');
+      } catch (_) {
+        const model = await api('/api/warehouse/models/' + id);
+        const lineage = await api('/api/warehouse/lineage?table=' + encodeURIComponent(model.qualified_name));
+        payload = {model, lineage};
+      }
+
+      const model = payload.model || {};
+      const lineage = payload.lineage || {};
       const evidence = model.evidence || {};
       const edges = lineage.edges || [];
       const upstream = [...new Set(edges.filter(e=>e.target===model.qualified_name || e.target===model.table).map(e=>e.source))];
       const downstream = [...new Set(edges.filter(e=>e.source===model.qualified_name || e.source===model.table).map(e=>e.target))];
-      const box = document.getElementById('whDetail');
-      box.style.display = 'block';
-      box.innerHTML = `<div class="section-head"><span class="section-title">${esc(model.qualified_name)}</span><span class="tag">${esc(model.layer)}</span></div>
-        <div class="panel">
-          <div class="kv"><div><small>主题域</small><b>${esc(model.domain)}</b></div><div><small>主题</small><b>${esc(model.subject)}</b></div><div><small>综合置信度</small><b>${(model.confidence*100).toFixed(0)}%</b></div></div>
-          <div class="wh-detail-grid">
-            <div><div class="section-title">识别依据</div><div class="wh-evidence section">分层：${esc((evidence.layer||[]).join('；'))}<br>主题域：${esc((evidence.domain||[]).join('；'))}<br>主题：${esc((evidence.subject||[]).join('；'))}<br>关联任务：${esc((evidence.task_names||[]).join(' / ') || '-')}</div></div>
-            <div><div class="section-title">上下游</div><div class="wh-evidence section">上游：${esc(upstream.join(' / ') || '无')}<br>下游：${esc(downstream.join(' / ') || '无')}<br>产生任务数：${model.produced_by_count} · 使用任务数：${model.consumed_by_count}</div></div>
+
+      document.getElementById('whDrawerTitle').textContent = model.qualified_name || model.table || '模型详情';
+      document.getElementById('whDrawerSubtitle').textContent = `${model.domain || '待识别'} / ${model.subject || '待识别主题'}`;
+      document.getElementById('whDrawerLayer').textContent = model.layer || '-';
+      document.getElementById('whDrawerBody').innerHTML = `
+        <div class="wh-drawer-kv">
+          <div><small>主题域</small><b>${esc(model.domain || '-')}</b></div>
+          <div><small>主题</small><b>${esc(model.subject || '-')}</b></div>
+          <div><small>综合置信度</small><b class="wh-confidence ${confidenceClass(model.confidence || 0)}">${((model.confidence||0)*100).toFixed(0)}%</b></div>
+        </div>
+
+        <div class="wh-block">
+          <div class="wh-block-title">识别依据</div>
+          <div class="wh-info-box wh-evidence">
+            <b>分层</b>：${esc((evidence.layer||[]).join('；') || '无')}<br>
+            <b>主题域</b>：${esc((evidence.domain||[]).join('；') || '无')}<br>
+            <b>主题</b>：${esc((evidence.subject||[]).join('；') || '无')}
           </div>
+        </div>
+
+        <div class="wh-block">
+          <div class="wh-block-title">关联 DolphinScheduler 任务</div>
+          <div class="wh-info-box">${renderChips(evidence.task_names || [], '暂无关联任务')}</div>
+        </div>
+
+        <div class="wh-block">
+          <div class="wh-block-title">上下游关系</div>
+          <div class="wh-direction">
+            <div class="wh-direction-col">
+              <div class="muted" style="margin-bottom:7px">上游 · ${upstream.length}</div>
+              <div class="wh-info-box">${renderChips(upstream, '无上游')}</div>
+            </div>
+            <div class="wh-direction-col">
+              <div class="muted" style="margin-bottom:7px">下游 · ${downstream.length}</div>
+              <div class="wh-info-box">${renderChips(downstream, '无下游')}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="wh-block">
+          <div class="wh-block-title">任务引用</div>
+          <div class="wh-info-box wh-evidence">产生任务数：<b>${model.produced_by_count ?? 0}</b>　使用任务数：<b>${model.consumed_by_count ?? 0}</b></div>
         </div>`;
-      box.scrollIntoView({behavior:'smooth', block:'nearest'});
-    } catch (e) { toast(e.message); }
+    } catch (e) {
+      document.getElementById('whDrawerBody').innerHTML = `<div class="empty">详情加载失败<br><span class="muted">${esc(e.message)}</span></div>`;
+      toast(e.message);
+    }
   }
 
   loadDomains = async function() {
@@ -147,6 +237,7 @@
       overview = data;
       selectedDomain = '';
       selectedLayer = '';
+      closeDrawer();
       renderLayers(data);
       renderDomains(data);
       await loadWarehouseModels();
