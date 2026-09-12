@@ -1,9 +1,10 @@
 services:
   warehouse-agent:
     build: .
+    restart: always
     ports:
       - "8000:8000"
     env_file:
       - .env
     volumes:
-      - ./data:/app/data
+      - ./data:/app/data:Z
