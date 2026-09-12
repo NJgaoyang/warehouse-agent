@@ -25,10 +25,10 @@ class FrontendFirstApp:
             if path in {"/", "/index.html"}:
                 html = INDEX_FILE.read_text(encoding="utf-8")
                 scripts = (
-                    '<script src="/warehouse-architecture.js?v=2"></script>\n'
-                    '<script src="/api-fix.js?v=1"></script>'
+                    '<script src="/warehouse-architecture.js?v=3"></script>\n'
+                    '<script src="/api-fix.js?v=2"></script>'
                 )
-                if '/warehouse-architecture.js?v=2' not in html:
+                if '/warehouse-architecture.js?v=3' not in html:
                     html = html.replace("</body>", scripts + "\n</body>")
                 response = HTMLResponse(html)
                 await response(scope, receive, send)
